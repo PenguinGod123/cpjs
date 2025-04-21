@@ -81,8 +81,10 @@ const server = http.createServer((req, res) => {
         }
     });
 });
-
-getPort().then(() => {
+async function setPortToDefault() {
+    serverPORT = 5000;
+}
+setPortToDefault().then(() => {
     server.listen(serverPORT, () => {
         console.log('Server running at port ' + serverPORT);
     });
