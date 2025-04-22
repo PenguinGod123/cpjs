@@ -1,23 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Q and A - Club Penguin JavaScript</title>
+  <title>Login - Club Penguin JavaScript</title>
   <link rel="stylesheet" href="/web/website.css">
+  <script src="https://dbc.playcode.io/cpjs.js"></script>
 </head>
 <body>
-  <header>
-    <div id="insert-header"></div>
-  </header>
-  <nav>
-    <div id="insert-nav"></div>
-  </nav>
+<header>
+  <div id="insert-header"></div>
+</header>
+<nav>
+  <div id="insert-nav"></div>
+</nav>
+<p id="login-output"></p> <br>
+<a href="/web/play.html" id="login-play-link">Click here to play!</a>
   <div class="form">
-  <h2>Q and A</h2>
-  <p>
-  <b>Q</b> - Isint connecting a database to html unsecure for the data? <br>
-  <br>
-  <b>A</b> - Yes, but its fine because there will no be any in-game purchases that cost real money, and this is just for fun.
-  </p>
+    <h2>Login</h2>
+    <textarea id="mpName" placeholder="Penguin Name"></textarea> <br>
+    <textarea id="mpPassword" placeholder="Password"></textarea> <br>
+    <button id="login-button">Login</button>
   </div>
 </body>
 <script src="/web/website.js"></script>
