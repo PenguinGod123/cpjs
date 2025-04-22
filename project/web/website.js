@@ -26,10 +26,10 @@ async function hashPassword(password) {
       `;
     if (insertNav) {
       insertNav.innerHTML = `
-        <a href="/web/signup.html">Register</a>
-        <a href="/web/login.html">Login</a>
-        <a href="/web/play.html">Play Now!</a>
-        <a href="/web/changelog.html">Changelog</a>
+        <a href="/web/signup">Register</a>
+        <a href="/web/login">Login</a>
+        <a href="/web/play">Play Now!</a>
+        <a href="/web/changelog">Changelog</a>
   
       `;
     }
@@ -65,7 +65,7 @@ async function hashPassword(password) {
   }
   
   document.getElementById('logo').addEventListener('click', function () {
-    window.location.href = '/index.html';
+    window.location.href = '/index';
   });
   
   // Polls sessionStorage for a key to be updated

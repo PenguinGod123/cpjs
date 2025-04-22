@@ -40,9 +40,15 @@ async function getPort(input) {
 }
 
 const server = http.createServer((req, res) => {
-    let filePath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);
+    let filePath = req.url.endsWith('/')
+    ? path.join(__dirname, req.url, 'index.html')
+    : path.join(__dirname, req.url);
 
-    // Ensure the file path does not append `.html` unnecessarily
+    if (!path.extname(filePath)) {
+        filePath += '.html';
+    }
+
+    // Ensure the file path does not append `.html` unnecessarily брух
     const extname = path.extname(filePath);
     let contentType = 'text/html';
 
@@ -79,7 +85,9 @@ const server = http.createServer((req, res) => {
         if (error) {
             if (error.code === 'ENOENT') {
                 res.writeHead(404, { 'Content-Type': 'text/html' });
-                res.end('<h1>404 Not Found</h1>', 'utf-8');
+                fs.readFile(path.join(__dirname, 'web/404.html'), (err, content) => {
+                    res.end(content, 'utf-8');
+                });
             } else {
                 res.writeHead(500);
                 res.end('Sorry, there was an error: ' + error.code + ' ..\n');
