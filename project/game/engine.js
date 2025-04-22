@@ -212,7 +212,7 @@ const gui = {
           <button id="icon-menu">|||</button>
         </div>
         <img id="icon-newspaper" src="https://codehs.com/uploads/77ed46772e04df270223da5be5c5ebef">
-        <iframe id="gui-newspaper" src="https://cpjs.playcode.io/game/gui/newspaper/pages/newspaper-main.html" style="display:none;"></iframe>
+        <iframe id="gui-newspaper" src="/game/gui/newspaper/pages/main.html" style="display:none;"></iframe>
       `;
       document.body.appendChild(guiDiv);
     }
@@ -224,7 +224,7 @@ window.gui = gui;
 // Scene Management
 const scene = {
   set(scene) {
-    document.body.style.backgroundImage = `url(https://cpjs.playcode.io/game/markup/${scene}.webp)`;
+    document.body.style.backgroundImage = `url(/game/markup/${scene}.webp)`;
 
     sessionStorage.setItem('scene', scene);
   },
@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (event.target.id === 'rc-menu-home') {
-      window.parent.location.href = '/index.html';
+      window.parent.location.href = '/index';
     }
   });
 
