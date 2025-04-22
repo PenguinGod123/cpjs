@@ -1,0 +1,138 @@
+body {
+    cursor: default;
+    overflow: hidden;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+      Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  }
+  
+  iframe {
+    width: 100%;
+    height: 100%;
+    transform: scale(1); /* Scale up the iframe by 50% */
+    transform-origin: 0 0; /* Keep the top-left corner fixed */
+    border: none; /* Optional: Remove border */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  #icon-newspaper {
+    z-index: 999;
+    cursor: pointer;
+    position: absolute;
+    width: auto;
+    height: 10%;
+    transition: 0.2s;
+  }
+  
+  #icon-newspaper:hover {
+    transform: scale(1.2);
+  }
+  
+  #icon-newspaper:active {
+    transform: scale(1);
+  }
+  
+  #gui-newspaper #gui-menu {
+    display: none; /* Initially hidden */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 50vh; /* Full viewport height */
+    width : 30vw;
+    overflow: hidden;
+    border: 5px solid white; /* Add a white border */
+    border-radius: 15px; /* Add rounded corners */
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+  }
+  
+  .toolbar {
+    display: flex;
+    align-items: center; /* Vertically centers the child */
+    margin: 0;
+    position: fixed;
+    bottom: 0;
+    width: 50%; /* Relative to the viewport width */
+    background-color: rgb(55, 141, 239);
+    border: 2%; /* Adjusted for proportional border thickness */
+    color: white;
+    justify-content: left;
+    left: 50%; /* Centering toolbar horizontally */
+    transform: translateX(-50%);
+    padding: 1%; /* Adjusted padding */
+    border-top-left-radius: 20px; /* Relative rounding */
+    border-top-right-radius: 20px;
+    z-index: 888;
+  }
+  
+  .toolbar img {
+    cursor: pointer;
+    height: 11%; /* Relative height to parent container */
+    width: auto; /* Maintaining aspect ratio */
+    margin: 1%; /* Spacing around the images */
+    transition: 0.2s;
+  }
+  
+  .toolbar img:hover {
+    transform: scale(1.2);
+  }
+  
+  .toolbar img:active {
+    transform: scale(1);
+  }
+  
+  .toolbar textarea {
+    border-radius: 25px; /* Adjusted for proportional rounding */
+    height: 12px; /* Relative to parent container */
+    resize: none;
+    overflow-y: hidden;
+    transition: 0.2s ease;
+  }
+  
+  .toolbar textarea:hover {
+    transform: scale(1.2);
+  }
+  
+  
+  #portal {
+    display: none;
+  }
+  
+  #rc-menu {
+    display: none; /* Start hidden */
+    position: absolute;
+    background-color: rgb(55, 141, 239);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    width: 150px;
+    border-radius: 15px;
+    color: white;
+    transition: 0.2s;
+  }
+  
+  #rc-menu ul {
+    border: none;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: 0.2s;
+  }
+  
+  #rc-menu li {
+    list-style: none;
+    padding: 10px;
+    border-radius: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: none;
+    transition: 0.2s;
+  }
+  
+  #rc-menu li:hover,
+  #rc-menu:hover {
+    background-color: rgb(55, 141, 239);
+    transform: scale(1.1);
+  }
+  

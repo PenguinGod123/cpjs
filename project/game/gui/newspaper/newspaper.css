@@ -1,0 +1,15 @@
+body {
+    margin: 0;
+    background-image: url('/game/gui/newspaper/newspaper.webp');
+    background-size: contain;
+    background-repeat: no-repeat; /* Prevents the image from repeating */
+    background-position: center center; /* Centers the image within the element */
+    height: 100vh; /* Optional: Ensure the body is the full viewport height */
+  }
+  
+  .nl {
+    color: black;
+    border: none;
+    background-color: grey;
+    padding: 10;
+  }

@@ -9,23 +9,29 @@ const rl = readline.createInterface({
 });
 rl.output.write('type "end" anytime to terminate the process\n');
 
-async function getPort() {
+async function getPort(input) {
     return new Promise((resolve) => {
-        rl.question('Enter PORT number\n', (port) => {
-            if (port) {
-                if (port === 'end') {
-                    console.log('Proccess terminated');
-                    server.close();
-                    rl.close();
-                } else {
-                    serverPORT = port;
-                    resolve();
+        if (input) {
+            serverPORT = input;
+            resolve();
+        } else {
+            rl.question('Enter PORT number\n', (port) => {
+                if (port) {
+                    if (port === 'end') {
+                        console.log('Process terminated');
+                        server.close();
+                        rl.close();
+                    } else {
+                        serverPORT = port;
+                        resolve();
+                    }
                 }
-            }
-        });
+            });
+        }
+
         rl.on('line', (input) => {
             if (input === 'end') {
-                console.log('Proccess terminated');
+                console.log('Process terminated');
                 server.close();
                 rl.close();
             }
@@ -33,13 +39,14 @@ async function getPort() {
     });
 }
 
-
 const server = http.createServer((req, res) => {
-    let filePath = path.join(__dirname, req.url === '/' || req.url === '/index' ? 'index.html' : req.url);
+    let filePath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);
 
+    // Ensure the file path does not append `.html` unnecessarily
     const extname = path.extname(filePath);
     let contentType = 'text/html';
 
+    // Set the correct MIME type based on the file extension
     switch (extname) {
         case '.js':
             contentType = 'text/javascript';
@@ -66,6 +73,8 @@ const server = http.createServer((req, res) => {
             contentType = 'text/html';
             break;
     }
+
+    // Read and serve the file
     fs.readFile(filePath, (error, content) => {
         if (error) {
             if (error.code === 'ENOENT') {
@@ -81,10 +90,8 @@ const server = http.createServer((req, res) => {
         }
     });
 });
-async function setPortToDefault() {
-    serverPORT = 5000;
-}
-setPortToDefault().then(() => {
+
+getPort(5000).then(() => {
     server.listen(serverPORT, () => {
         console.log('Server running at port ' + serverPORT);
     });

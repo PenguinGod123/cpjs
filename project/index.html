@@ -1,10 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>Hi</title>
-    </head>
-    <body>
-        <h1>Hello, World!</h1>
-        <p>This is a simple HTML page.</p>
-    </body>
+  <head>
+    <title>Club Penguin JavaScript</title>
+    <link rel="stylesheet" href="/web/website.css" />
+    <script src="https://dbc.playcode.io/cpjs.js"></script>
+  </head>
+  <body>
+    <header>
+      <div id="insert-header"></div>
+    </header>
+    <nav>
+      <div id="insert-nav"></div>
+    </nav>
+    <div class="INDEXanm">
+      <h2>ANNOUNCMENTS</h2>
+      <h3>DISNEY owns Club Penguin! not me!</h3>
+      <p>
+        Recently, I just finished the succesful login/signup process. Database
+        connection was succesful. Multiplayer working. There will be an
+        <b>Open Github Repository</b> coming soon. <br />
+        <br />
+        Discord : <b>tpbanana</b> <br />
+        <br />
+        <a href="/web/changelog.html">Changelog (BETA)</a> <br />
+        <br />
+        <a href="/web/q-a">Q and A</a>
+      </p>
+    </div>
+    <div class="form">
+      <h2 id="currentNameDisplay"></h2>
+      <button
+        id="INDEXplay-link"
+        onclick="window.location.href='/web/play.html'"
+      >
+        Play Now!
+      </button>
+      <button id="logout-button">Log Out</button>
+    </div>
+  </body>
+  <script src="/web/website.js"></script>
 </html>

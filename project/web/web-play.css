@@ -1,0 +1,17 @@
+html, body {
+    height: 100%;
+}
+
+#play-iframe {
+  border: none;
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+
+#play-output {
+  border: none;
+  padding: 20px;
+  border-radius: 15px;
+  background-color: red;
+}

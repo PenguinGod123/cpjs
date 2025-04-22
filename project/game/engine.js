@@ -1,0 +1,287 @@
+document.body.style.backgroundSize = 'cover';
+document.body.style.backgroundRepeat = 'no-repeat';
+
+function percentToPixels(percentage, totalDimension) {
+    return (percentage / 100) * totalDimension;
+}
+
+console.log(localStorage.getItem('scene'));
+// Multiplayer Game Script
+document.body.insertAdjacentHTML(
+  'afterbegin',
+  `<div id="rc-menu"><ul><li id="rc-menu-home">Home</li><li>Back</li></ul></div>`
+);
+
+// Multiplayer Player Controller
+const mpc = {
+  spawn(x, y) {
+    const userId = localStorage.getItem('currentUser');
+    if (!userId) {
+      console.error('User ID is not set.');
+      return;
+    }
+
+    if (userId === null) {
+      console.warn('Error: IU')
+      return;
+    }
+
+    // Update user data
+    updateUserData(userId, {
+      online: 'y',
+      location: { x: x, y: y },
+      direction: 'default',
+    });
+
+    let player = document.getElementById(userId);
+
+    if (!player) {
+      // Create player element
+      player = document.createElement('img');
+      player.id = userId;
+      player.src =
+        'https://codehs.com/uploads/12ae6fc185a97a71f54b726e1432e321'; // Default image
+      player.alt = userId;
+      Object.assign(player.style, {
+        position: 'absolute',
+        height: '10%',
+        width: 'auto',
+        transition: '0.8s',
+        top: `${y}%`,
+        left: `${x}%`,
+      });
+
+      document.body.appendChild(player);
+      updateUserData(userId, { location: { x: `${percentToPixels(x, window.innerHeight)}px`, y: `${percentToPixels(y, window.innerHeight)}px`, }, });
+    }
+    player = document.getElementById(userId);
+
+    window.mp = player; // Save player element globally
+    mp.top = y;
+    mp.left = x;
+    console.log('Player spawned:', userId);
+  },
+
+  enableMovement(enable) {
+    if (!window.mp) {
+      console.error("Player element ('mp') not initialized.");
+      return;
+    }
+
+    if (!enable) {
+      console.log('Movement disabled.');
+      return;
+    }
+
+    // Enable click-based movement
+    document.addEventListener('mousedown', event => {
+      const userId = localStorage.getItem('currentUser');
+      if (!userId) return;
+
+      const { clientX, clientY } = event;
+
+      // Define the bottom middle region
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
+
+      const minX = screenWidth * 0.15; // 20% width from left
+      const maxX = screenWidth * 0.85; // 80% width from left
+      const minY = screenHeight * 0.55; // Bottom 20% of screen
+
+      if (clientX >= minX && clientX <= maxX && clientY >= minY) {
+        const player = document.getElementById(userId);
+
+        updateUserData(userId, { location: { x: clientX, y: clientY } });
+        console.log(`Position updated: (${clientX}, ${clientY})`);
+      } else {
+        console.log('Click ignored: Not in the designated movement area.');
+      }
+    });
+
+    console.log('Click-based movement enabled.');
+  },
+};
+
+window.mpc = mpc;
+
+// Update player direction based on mouse movement
+document.addEventListener('mousemove', event => {
+  const userId = localStorage.getItem('currentUser');
+  if (!userId) return;
+
+  const player = document.getElementById(userId);
+  if (!player) return;
+
+  const { clientX, clientY } = event;
+  const { left, right, top, bottom } = player.getBoundingClientRect();
+
+  readUserDataByName(localStorage.getItem('currentUser')).then(data => {
+    window.readData1231234 = data;
+  });
+
+  if (readData1231234.skin === 'bluepenguin') {
+    window.directionMap = {
+      left: 'https://codehs.com/uploads/9a796bc9d2d250e7903cb79a94b12331',
+      right: 'https://codehs.com/uploads/799edbfdbe64d6ea9e397ad818fa5429',
+      up: 'https://codehs.com/uploads/14210849542fff8211c671bf9aa9a3f4',
+      down: 'https://codehs.com/uploads/12ae6fc185a97a71f54b726e1432e321',
+    };
+  }
+
+  let directionImage;
+  if (clientX < left) directionImage = directionMap.left;
+  else if (clientX > right) directionImage = directionMap.right;
+  else if (clientY < top) directionImage = directionMap.up;
+  else if (clientY > bottom) directionImage = directionMap.down;
+
+  if (directionImage) {
+    updateUserData(userId, { direction: directionImage });
+  }
+});
+
+// Synchronize player data
+async function syncPlayers() {
+  await readUserDataByName('').then(allusers => {
+    console.log('Fetched raw data:');
+    window.allusers = allusers; // Store the data globally for debugging purposes
+  });
+
+  if (!window.allusers || typeof window.allusers !== 'object') {
+    console.error('Invalid user data format:', window.allusers);
+    return;
+  }
+
+  const allUsers = window.allusers;
+
+  Object.entries(allUsers).forEach(([userId, data]) => {
+    if (!userId || typeof data !== 'object') return;
+
+    // Example condition: Set offline if user has no activity
+    if (data.lastActive && Date.now() - data.lastActive > 25000) {
+      // 25 seconds idle
+      updateUserData(userId, { online: 'n' });
+      console.log(`Setting user offline due to inactivity: ${userId}`);
+    }
+
+    // Process online users
+    if (data.online === 'y') {
+      let player = document.getElementById(userId);
+
+      if (!player) {
+        console.log(`Creating new player element for: ${userId}`);
+        player = document.createElement('img');
+        player.id = userId;
+        player.src = data.direction;
+        player.alt = data.name;
+        Object.assign(player.style, {
+          position: 'absolute',
+          height: '65px',
+          width: 'auto',
+          transition: '0.8s',
+        });
+        document.body.appendChild(player);
+      } else {
+        console.log(`Updating player position for: ${userId}`);
+        player.style.zIndex = 0;
+        player.style.left = `${data.location.x}px`;
+        player.style.top = `${data.location.y}px`;
+        player.setAttribute('src', data.direction);
+      }
+    } else {
+      const offlinePlayer = document.getElementById(userId);
+      if (offlinePlayer || data.name === ('null' || null)) {
+        console.log(`Removing player element for offline user: ${userId}`);
+        offlinePlayer.remove();
+      }
+    }
+  });
+}
+
+window.syncPlayers = syncPlayers;
+
+// GUI Management
+const gui = {
+  spawn() {
+    if (!document.getElementById('guiDiv')) {
+      const guiDiv = document.createElement('div');
+      guiDiv.id = 'guiDiv';
+      guiDiv.innerHTML = `
+        <div class="toolbar">
+          <img id="icon-message" src="https://codehs.com/uploads/67a6a3cf13c59a5fa136f75e6adfcb15">
+          <textarea id="message-box" placeholder="Message"></textarea>
+          <button id="icon-menu">|||</button>
+        </div>
+        <img id="icon-newspaper" src="https://codehs.com/uploads/77ed46772e04df270223da5be5c5ebef">
+        <iframe id="gui-newspaper" src="https://cpjs.playcode.io/game/gui/newspaper/pages/newspaper-main.html" style="display:none;"></iframe>
+      `;
+      document.body.appendChild(guiDiv);
+    }
+  },
+};
+
+window.gui = gui;
+
+// Scene Management
+const scene = {
+  set(scene) {
+    document.body.style.backgroundImage = `url(https://cpjs.playcode.io/game/markup/${scene}.webp)`;
+
+    sessionStorage.setItem('scene', scene);
+  },
+
+  get() {
+    return sessionStorage.getItem('scene');
+  },
+};
+
+window.scene = scene;
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+  // Custom right-click menu
+  document.addEventListener('contextmenu', event => {
+    event.preventDefault();
+    const rcMenu = document.getElementById('rc-menu');
+    rcMenu.style.top = `${Math.min(
+      event.clientY,
+      window.innerHeight - rcMenu.offsetHeight
+    )}px`;
+    rcMenu.style.left = `${Math.min(
+      event.clientX,
+      window.innerWidth - rcMenu.offsetWidth
+    )}px`;
+    rcMenu.style.display = 'block';
+  });
+
+  document.addEventListener('click', () => {
+    document.getElementById('rc-menu').style.display = 'none';
+  });
+
+  document.addEventListener('click', event => {
+    if (event.target.id === 'icon-newspaper') {
+      const guiNewspaper = document.getElementById('gui-newspaper');
+      guiNewspaper.style.display =
+        guiNewspaper.style.display === 'none' ? 'block' : 'none';
+    }
+
+    if (event.target.id === 'icon-message') {
+      sendMessage(document.getElementById('message-box').value);
+    }
+
+    if (event.target.id === 'rc-menu-home') {
+      window.parent.location.href = '/index.html';
+    }
+  });
+
+  // Clean up player data on page exit
+  window.addEventListener('beforeunload', event => {
+    const userId = localStorage.getItem('currentUser');
+    updateUserData(userId, { online: 'n', location: { x: null, y: null } });
+    // Set a message for the browser's confirmation dialog
+    event.preventDefault();
+    event.returnValue = ''; // This triggers the default dialog for most browsers
+
+    // Optionally show a custom message for context
+    console.log('Custom message: Are you sure you want to leave?');
+  });
+});
