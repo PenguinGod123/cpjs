@@ -7,9 +7,13 @@ body {
     height: 100vh; /* Optional: Ensure the body is the full viewport height */
   }
   
-  .nl {
+  #nl {
     color: black;
     border: none;
     background-color: grey;
-    padding: 10;
+    padding: 10px;
+    height: 90%;
+    top: 50%;
+    left: 0;
+    position: absolute;
   }
