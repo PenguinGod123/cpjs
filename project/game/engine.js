@@ -88,7 +88,7 @@ const mpc = {
       const maxX = screenWidth * 0.85; // 80% width from left
       const minY = screenHeight * 0.55; // Bottom 20% of screen
 
-      if (clientX >= minX && clientX <= maxX && clientY >= minY) {
+      if (clientX >= minX && clientX <= maxX && clientY >= minY || event.target.id !== 'toolbar') {
         const player = document.getElementById(userId);
 
         updateUserData(userId, { location: { x: clientX, y: clientY } });
