@@ -233,6 +233,25 @@ const scene = {
   get() {
     return sessionStorage.getItem('scene');
   },
+
+  addObject(id, data) {
+    const object = document.createElement('div');
+    object.id = `scene-object:${id}`;
+    object.className = 'scene-object';
+    object.style.position = 'absolute';
+    object.style.top = `${data.location.y}px`;
+    object.style.left = `${data.location.x}px`;
+    object.style.width = `${data.size.width}%`;
+    object.style.height = `${data.size.height}%`;
+    object.style.backgroundImage = `url(${data.backgroundImage})`;
+    document.body.appendChild(object);
+    if (object.type === 'portal') {
+      object.addEventListener('click', () => {
+        const targetScene = data.portalTarget;
+        scene.set(targetScene);
+      });
+    }
+  }
 };
 
 window.scene = scene;
