@@ -137,6 +137,7 @@ document.addEventListener('mousemove', event => {
   if (directionImage) {
     updateUserData(userId, { direction: directionImage });
   }
+  updateUserData(userId, {scene: scene.get()});
 });
 
 // Synchronize player data
@@ -187,7 +188,7 @@ async function syncPlayers() {
         player.style.top = `${data.location.y}px`;
         player.setAttribute('src', data.direction);
       }
-    } else {
+    } else if (data.online === 'n' || data.scene !== scene.get()) {
       const offlinePlayer = document.getElementById(userId);
       if (offlinePlayer || data.name === ('null' || null)) {
         console.log(`Removing player element for offline user: ${userId}`);
