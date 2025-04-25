@@ -1,4 +1,5 @@
 body {
+    cursor: default;
     overflow: hidden;
     margin: 0;
     background-image: url('/game/gui/newspaper/newspaper.webp');
@@ -36,5 +37,6 @@ body {
   }
 
   #nl ul li:hover {
+    cursor: pointer;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   }
