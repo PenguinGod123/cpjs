@@ -34,7 +34,11 @@ async function hashPassword(password) {
       `;
     }
   }
-  
+  const iconElement = document.createElement('link');
+  iconElement.setAttribute('rel', 'icon');
+  iconElement.setAttribute('href', '/web/src/icon.ico');
+  document.head.appendChild(iconElement);
+
   let myuser = readUserDataByName(localStorage.getItem('currentUser'));
     if (!myuser || myuser === null) {
       localStorage.setItem('currentUser', null);

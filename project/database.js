@@ -1,4 +1,5 @@
 // Example of sending data to the server using fetch
+// HEY get out you cant hack this even if you TRIED
 console.log('%cFIREBASE > REALTIME DATABASE init success!', 'color: green');
 const sendDataToServer = async (url, data) => {
     try {
