@@ -29,7 +29,7 @@ const sendDataToServer = async (url, data) => {
         name: name
     }
     const returndata = await sendDataToServer(serverUrl, dataToSend);
-    return returndata;
+    return returndata; // Return the response data
   }
 
   async function updateUserData(name, data) {

@@ -54,6 +54,9 @@ async function getPort(input) {
 }
 
 const server = http.createServer((req, res) => {
+    const protocol = req.headers['x-forwarded-proto'] || 'http'; // Use 'https' if behind a proxy
+    const host = req.headers.host; // Get the host (e.g., localhost:3000)
+    const fullUrl = `${protocol}://${host}${req.url}`; // Construct the full URL
 
         // Handle POST requests from client and send the data back
         if (req.method === 'POST') {
@@ -75,12 +78,6 @@ const server = http.createServer((req, res) => {
                 }
             
                 if (parsedBody.action === 'readUserDataByName') {
-                    if (!parsedBody.name || parsedBody.name === 'null') {
-                        res.writeHead(400, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ error: 'Invalid user name' }));
-                        return;
-                    }
-            
                     try {
                         const snapshot = await db.ref(`cpjs/users/${parsedBody.name}`).once('value');
                         const userData = snapshot.val(); // Extract snapshot data
