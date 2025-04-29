@@ -69,3 +69,8 @@ const sendDataToServer = async (url, data) => {
   }
   sendDataToServer(serverUrl, dataToSend);
 }
+
+window.updateUserData = updateUserData;
+window.removeUser = removeUser;
+window.pushNewUser = pushNewUser;
+window.readUserDataByName = readUserDataByName;

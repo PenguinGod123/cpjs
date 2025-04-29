@@ -122,7 +122,7 @@ const server = http.createServer((req, res) => {
                         res.end(JSON.stringify({ error: 'Internal server error' }));
                     });
                 } else if (parsedBody.action === 'pushNewUser') {
-                    db.ref(`cpjs/users/${parsedBody.name}`).set(parsedBody.data).then(() => {
+                    db.ref(`cpjs/users/${parsedBody.data.name}`).set(parsedBody.data).then(() => {
                         console.log('User data pushed successfully');
                         res.writeHead(200, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify({ message: 'User data pushed successfully' }));

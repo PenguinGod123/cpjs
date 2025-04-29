@@ -89,7 +89,7 @@ async function hashPassword(password) {
       const registerOutput = document.getElementById('register-output');
       if (!registerOutput) return;
   
-      const mpName = document.getElementById('mpName').value.trim();
+      const mpName = await document.getElementById('mpName').value;
       const mpPassword = document.getElementById('mpPassword').value;
       const mpEmail = document.getElementById('mpEmail').value;
       const ppcc = document.getElementById('ppcheckbox').checked;
@@ -125,7 +125,7 @@ async function hashPassword(password) {
           return;
         } else if (!user) {
           const hashedPassword = await hashPassword(mpPassword); // Hash the password
-          await pushNewUser(mpName, hashedPassword, mpEmail); // Store the hashed password
+          await pushNewUser(mpName, hashedPassword, mpEmail);
           registerOutput.style.display = 'block';
           registerOutput.style.backgroundColor = 'lightgreen';
           registerOutput.textContent = `Congrats! ${mpName} has been successfully registered!`;
