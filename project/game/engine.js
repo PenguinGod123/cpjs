@@ -210,10 +210,11 @@ const gui = {
         <div class="toolbar">
           <img id="icon-message" src="https://codehs.com/uploads/67a6a3cf13c59a5fa136f75e6adfcb15">
           <textarea id="message-box" placeholder="Message"></textarea>
-          <button id="icon-menu">|||</button>
+          <button id="icon-menu" style="margin: 5px;">|||</button>
         </div>
         <img id="icon-newspaper" src="https://codehs.com/uploads/77ed46772e04df270223da5be5c5ebef">
         <iframe id="gui-newspaper" src="/game/gui/newspaper/pages/main.html" style="display:none;"></iframe>
+        <iframe id="gui-menu" src="/game/gui/menu/pages/main.html" style="display:none;"></iframe>
       `;
       document.body.appendChild(guiDiv);
     }
@@ -239,8 +240,8 @@ const scene = {
     object.id = `scene-object:${id}`;
     object.className = 'scene-object';
     object.style.position = 'absolute';
-    object.style.top = `${data.location.y}px`;
-    object.style.left = `${data.location.x}px`;
+    object.style.top = `${percentToPixels(data.location.y, window.innerHeight)}px`;
+    object.style.left = `${percentToPixels(window.innerWidth, data.location.x)}px`;
     object.style.width = `${data.size.width}%`;
     object.style.height = `${data.size.height}%`;
     object.style.backgroundImage = `url(${data.backgroundImage})`;
@@ -282,6 +283,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const guiNewspaper = document.getElementById('gui-newspaper');
       guiNewspaper.style.display =
         guiNewspaper.style.display === 'none' ? 'block' : 'none';
+    }
+
+    if (event.target.id === 'icon-menu') {
+      const guiMenu = document.getElementById('gui-menu');
+      guiMenu.style.display = guiMenu.style.display === 'none' ? 'block' : 'none';
     }
 
     if (event.target.id === 'icon-message') {

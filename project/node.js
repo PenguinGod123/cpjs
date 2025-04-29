@@ -7,9 +7,23 @@ const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
-rl.output.write('type "end" anytime to terminate the process\n');
+const firebase = require('firebase/app');
+require('firebase/database');
+const firebaseConfig = {
+    apiKey: 'AIzaSyDSZ8Sf_4drlrJkH_r1_9TVEF6xZyU7Vg8',
+    authDomain: 'cpjs-662f5.firebaseapp.com',
+    databaseURL: 'https://cpjs-662f5-default-rtdb.firebaseio.com/',
+    projectId: 'cpjs-662f5',
+    storageBucket: 'cpjs-662f5.firebaseapp.com',
+    messagingSenderId: '306683211357',
+    appId: '1:306683211357:web:367e12554760ebe5a3a7b4',
+    measurementId: 'G-VE4TPPP91N',
+  };
+  firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
 async function getPort(input) {
+    rl.output.write('type "end" anytime to terminate the process\n');
     return new Promise((resolve) => {
         if (input) {
             serverPORT = input;
@@ -40,9 +54,92 @@ async function getPort(input) {
 }
 
 const server = http.createServer((req, res) => {
+
+        // Handle POST requests from client and send the data back
+        if (req.method === 'POST') {
+            let body = '';
+            req.on('data', chunk => {
+                body += chunk.toString();
+            });
+            req.on('end', async () => {
+                console.log(`Server received: ${body}`);
+                let parsedBody;
+            
+                try {
+                    parsedBody = JSON.parse(body); // Parse the body as JSON
+                } catch (error) {
+                    console.error('Error parsing JSON:', error);
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Invalid JSON format' }));
+                    return;
+                }
+            
+                if (parsedBody.action === 'readUserDataByName') {
+                    if (!parsedBody.name || parsedBody.name === 'null') {
+                        res.writeHead(400, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Invalid user name' }));
+                        return;
+                    }
+            
+                    try {
+                        const snapshot = await db.ref(`cpjs/users/${parsedBody.name}`).once('value');
+                        const userData = snapshot.val(); // Extract snapshot data
+            
+                        if (userData) {
+                            console.log('Successful read');
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify(userData)); // Send user data as JSON
+                        } else {
+                            console.warn("No user data found for:", parsedBody.name);
+                            res.writeHead(404, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ error: 'User not found' }));
+                        }
+                    } catch (error) {
+                        console.error("Error reading user data:", error);
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Internal server error' }));
+                    }
+                } else if (parsedBody.action === 'updateUserData') {
+                    db.ref(`cpjs/users/${parsedBody.name}`).update(parsedBody.data).then(() => {
+                        console.log('User data updated successfully');
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ message: 'User data updated successfully' }));
+                    }
+                    ).catch((error) => {
+                        console.error('Error updating user data:', error);
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Internal server error' }));
+                    });
+                } else if (parsedBody.action === 'removeUser') {
+                    db.ref(`cpjs/users/${parsedBody.name}`).remove().then(() => {
+                        console.log(`${parsedBody.name} data removed successfully`);
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ message: `${parsedBody.name} data removed successfully` }));
+                    }
+                    ).catch((error) => {
+                        console.error('Error removing user data:', error);
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Internal server error' }));
+                    });
+                } else if (parsedBody.action === 'pushNewUser') {
+                    db.ref(`cpjs/users/${parsedBody.name}`).set(parsedBody.data).then(() => {
+                        console.log('User data pushed successfully');
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ message: 'User data pushed successfully' }));
+                    }
+                    ).catch((error) => {
+                        console.error('Error pushing user data:', error);
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Internal server error' }));
+                    });
+                }
+            });
+            return;
+        }
+
     let filePath = req.url.endsWith('/')
     ? path.join(__dirname, req.url, 'index.html')
-    : path.join(__dirname, req.url);
+    : req.url === '/api' ? '' : path.join(__dirname, req.url);
 
     if (!path.extname(filePath)) {
         filePath += '.html';
@@ -82,6 +179,9 @@ const server = http.createServer((req, res) => {
 
     // Read and serve the file
     fs.readFile(filePath, (error, content) => {
+        if (filePath === '' || filePath === undefined || filePath === null) {
+            return;
+        }
         if (error) {
             if (error.code === 'ENOENT') {
                 res.writeHead(404, { 'Content-Type': 'text/html' });

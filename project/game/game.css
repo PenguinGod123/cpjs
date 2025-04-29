@@ -68,7 +68,7 @@ body {
   
   .toolbar img {
     cursor: pointer;
-    height: 11%; /* Relative height to parent container */
+    height: 5vh; /* Relative height to parent container */
     width: auto; /* Maintaining aspect ratio */
     margin: 1%; /* Spacing around the images */
     transition: 0.2s;
