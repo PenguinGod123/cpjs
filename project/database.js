@@ -1,4 +1,5 @@
 // Example of sending data to the server using fetch
+console.log('%cFIREBASE > REALTIME DATABASE init success!', 'color: green');
 const sendDataToServer = async (url, data) => {
     try {
       const response = await fetch(url, {
