@@ -176,7 +176,7 @@ async function syncPlayers() {
   Object.entries(allUsers).forEach(([userId, data]) => {
     if (!userId || typeof data !== 'object') return;
     if (data.name === ('null' || null)) {
-      removeUserData(data.name);
+      removeUser('null');
       return;
     }
 
