@@ -175,6 +175,10 @@ async function syncPlayers() {
 
   Object.entries(allUsers).forEach(([userId, data]) => {
     if (!userId || typeof data !== 'object') return;
+    if (data.name === ('null' || null)) {
+      removeUserData(data.name);
+      return;
+    }
 
     // Example condition: Set offline if user has no activity
     if (data.lastActive && Date.now() - data.lastActive > 25000) {
@@ -203,8 +207,12 @@ async function syncPlayers() {
       } else {
         console.log(`Updating player position for: ${userId}`);
         player.style.zIndex = 0;
-        player.style.left = `${data.location.x}px`;
-        player.style.top = `${data.location.y}px`;
+        if (data.location && data.location.x != null && data.location.y != null) {
+          player.style.left = `${data.location.x}px`;
+          player.style.top = `${data.location.y}px`;
+        } else {
+          console.warn(`Invalid location data for user: ${userId}`);
+        }
         player.setAttribute('src', data.direction);
       }
     } else if (data.online === 'n' || data.scene !== scene.get()) {

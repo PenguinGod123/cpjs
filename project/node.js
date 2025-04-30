@@ -150,6 +150,9 @@ const server = http.createServer((req, res) => {
                         res.end(JSON.stringify({ error: 'Internal server error' }));
                     }
                 } else if (parsedBody.action === 'updateUserData') {
+                    if (parsedBody.name === ('null' || null)) {
+                        return;
+                    }
                     db.ref(`cpjs/users/${parsedBody.name}`).update(parsedBody.data).then(() => {
                         console.log('User data updated successfully');
                         res.writeHead(200, { 'Content-Type': 'application/json' });
