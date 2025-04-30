@@ -33,8 +33,10 @@ async function getPort(input) {
                 if (port) {
                     if (port === 'end') {
                         console.log('Process terminated');
-                        server.close();
-                        rl.close();
+                        server.close(() => {
+                            rl.close();
+                            process.exit(0);
+                        });
                     } else {
                         serverPORT = port;
                         resolve();
@@ -42,21 +44,72 @@ async function getPort(input) {
                 }
             });
         }
-
-        rl.on('line', (input) => {
-            if (input === 'end') {
-                console.log('Process terminated');
-                server.close();
-                rl.close();
-            }
-        });
     });
 }
+
+rl.on('line', (input) => {
+    if (input === 'end') {
+        console.log('Process terminated');
+        server.close(() => {
+            rl.close(); // Close the readline interface after the server has closed
+            process.exit(0);
+        });
+    } else if (input === 'dbTEST') {
+        console.log('Testing database');
+        rl.question('enter path\n', (path) => {
+            rl.question('command?\n', (command) => {
+                if (command === 'end') {
+                    console.log('Process terminated');
+                    server.close(() => {
+                        rl.close(); // Close the readline interface after the server has closed
+                        process.exit(0);
+                    });
+                    return;
+                }
+                if (command === 'once') {
+                    rl.question('data?\n', async (extradata) => {
+                        try {
+                            console.log(`Running db.ref('${path}').${command}('value')`);
+                            const snapshot = await db.ref(path).once('value'); // Await the Promise
+                            const result = snapshot.val(); // Extract the value from the snapshot
+                            console.log('Result:', result);
+                        } catch (error) {
+                            console.error('Error executing database command:', error);
+                        }
+                    });
+                } else if (command === 'set') {
+                    rl.question('data?\n', async (data) => {
+                        try {
+                            console.log(`Running db.ref('${path}').${command}(${data})`);
+                            await db.ref(path).set(data); // Await the Promise
+                            console.log('Data set successfully');
+                        } catch (error) {
+                            console.error('Error executing database command:', error);
+                        }
+                    });
+                } else if (command === 'remove') {
+                    rl.question('data?\n', async (data) => {
+                        try {
+                            console.log(`Running db.ref('${path}').remove();`);
+                            await db.ref(path + '/' + data).remove(); // Correctly remove the data at the specified path
+                            console.log('Data removed successfully');
+                        } catch (error) {
+                            console.error('Error executing database command:', error);
+                        }
+                    });
+                } else {
+                    console.error('Unsupported command:', command);
+                }
+            });
+        });
+    }
+});
 
 const server = http.createServer((req, res) => {
     const protocol = req.headers['x-forwarded-proto'] || 'http'; // Use 'https' if behind a proxy
     const host = req.headers.host; // Get the host (e.g., localhost:3000)
     const fullUrl = `${protocol}://${host}${req.url}`; // Construct the full URL
+    console.log(`URL attempting to access: ${fullUrl}`);
 
         // Handle POST requests from client and send the data back
         if (req.method === 'POST') {

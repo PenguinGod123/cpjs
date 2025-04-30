@@ -73,6 +73,8 @@ const mpc = {
       return;
     }
 
+    const speed = 200; // pixels per second
+
     // Enable click-based movement
     document.addEventListener('mousedown', event => {
       const userId = localStorage.getItem('currentUser');
@@ -90,6 +92,23 @@ const mpc = {
 
       if (clientX >= minX && clientX <= maxX && clientY >= minY) {
         const player = document.getElementById(userId);
+
+        const rect = player.getBoundingClientRect();
+        const currentX = rect.left + rect.width / 2;
+        const currentY = rect.top + rect.height / 2;
+
+        const distance = Math.sqrt(
+          Math.pow(clientX - currentX, 2) + Math.pow(clientY - currentY, 2)
+        );
+
+        const duration = distance / speed; // time = distance / speed
+
+        // Update the transition duration dynamically
+        player.style.transitionDuration = `${duration}s`;
+
+        // Move the player
+        player.style.left = `${clientX}px`;
+        player.style.top = `${clientY}px`;
 
         updateUserData(userId, { location: { x: clientX, y: clientY } });
         console.log(`Position updated: (${clientX}, ${clientY})`);
