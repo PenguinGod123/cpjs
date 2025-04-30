@@ -54,7 +54,7 @@ rl.on('line', (input) => {
             rl.close(); // Close the readline interface after the server has closed
             process.exit(0);
         });
-    } else if (input === 'dbTEST') {
+    } else if (input === 'test database') {
         console.log('Testing database');
         rl.question('enter path\n', (path) => {
             rl.question('command?\n', (command) => {
