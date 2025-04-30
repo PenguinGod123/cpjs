@@ -150,7 +150,12 @@ const server = http.createServer((req, res) => {
                         res.end(JSON.stringify({ error: 'Internal server error' }));
                     }
                 } else if (parsedBody.action === 'updateUserData') {
-                    if (parsedBody.name === ('null' || null)) {
+                    if (parsedBody.name === ('null' || null)) return;
+                    const check = await db.ref(parsedBody.name).once();
+                    if (check.val() === null) {
+                        console.log('User not found');
+                        res.writeHead(404, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'User not found' }));
                         return;
                     }
                     db.ref(`cpjs/users/${parsedBody.name}`).update(parsedBody.data).then(() => {
