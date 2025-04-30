@@ -38,7 +38,7 @@ async function hashPassword(password) {
   iconElement.setAttribute('rel', 'icon');
   iconElement.setAttribute('href', '/web/src/icon.png');
   document.head.appendChild(iconElement);
-
+  console.log('test');
   let myuser = readUserDataByName(localStorage.getItem('currentUser'));
     if (!myuser || myuser === null) {
       localStorage.setItem('currentUser', null);
