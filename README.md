@@ -20,8 +20,8 @@
         }, <br>
         "direction": "https://example.com/up.webp", <br>
         "mod": 'n', <br>
-        "inventory": { <br>
+        "inventory": [ <br>
           
-        } <br>
+         ] <br>
       }, <br>
      } <br>
