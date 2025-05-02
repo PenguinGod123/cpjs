@@ -4,7 +4,9 @@ gui.spawn();
 mpc.spawn(50, 60);
 mpc.enableMovement(true);
 
-syncPlayers();
+setInterval(() => {
+    syncPlayers();
+}, 1000);
 
 if (scene.get() === 'welcomeroom') {
     scene.addObject('toPlaza', {

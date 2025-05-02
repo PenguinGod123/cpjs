@@ -15,20 +15,19 @@ document.body.insertAdjacentHTML(
 
 // Multiplayer Player Controller
 const mpc = {
-  spawn(x, y) {
+  async spawn(x, y) {
     const userId = localStorage.getItem('currentUser');
     if (!userId) {
       console.error('User ID is not set.');
       return;
     }
-
+    
     // Update user data to mark the player as online
     updateUserData(userId, {
       online: 'y',
       location: { x: x, y: y },
-      direction: '/game/skins/bluepenguin/down.png',
+      direction: `/game/skins/bluepenguin/down.png`,
     });
-
     let player = document.getElementById(userId);
 
     if (!player) {
@@ -36,7 +35,7 @@ const mpc = {
       player = document.createElement('img');
       player.id = userId;
       player.src =
-        'https://codehs.com/uploads/12ae6fc185a97a71f54b726e1432e321'; // Default image
+        `/game/skins/bluepenguin/down.png`;
       player.alt = userId;
       Object.assign(player.style, {
         position: 'absolute',
@@ -54,7 +53,7 @@ const mpc = {
     updateUserData(userId, {
       online: 'y',
       location: { x: x, y: y },
-      direction: 'default',
+      direction: `/game/skins/bluepenguin/down.png`,
     });
     console.log('Player spawned:', userId);
   },
@@ -140,13 +139,20 @@ document.addEventListener('mousemove', event => {
       down: `/game/skins/${skin}/down.png`,
     };
     let directionImage;
-    if (clientX < left) directionImage = directionMap.left;
-    else if (clientX > right) directionImage = directionMap.right;
-    else if (clientY < top) directionImage = directionMap.up;
-    else if (clientY > bottom) directionImage = directionMap.down;
+    if (clientX < left && Math.abs(clientX - left) > Math.abs(clientY - top)) {
+      directionImage = directionMap.left;
+    } else if (clientX > right && Math.abs(clientX - right) > Math.abs(clientY - bottom)) {
+      directionImage = directionMap.right;
+    } else if (clientY < top) {
+      directionImage = directionMap.up;
+    } else if (clientY > bottom) {
+      directionImage = directionMap.down;
+    }
   
     if (directionImage) {
       updateUserData(userId, { direction: directionImage });
+    } else {
+      console.warn('no direction image found');
     }
   });
   updateUserData(userId, {scene: scene.get()});
@@ -171,7 +177,6 @@ async function syncPlayers() {
     // Process online users
     if (data.online === 'y' && data.scene === scene.get()) {
       let player = document.getElementById(userId);
-      updateUserData(userId, { online: 'y' });
 
       if (!player) {
         console.log(`Creating new player element for: ${userId}`);
@@ -192,7 +197,9 @@ async function syncPlayers() {
         if (data.location && data.location.x != null && data.location.y != null) {
           player.style.left = `${data.location.x}px`;
           player.style.top = `${data.location.y}px`;
-          player.src = data.direction;
+          if (player.src !== data.direction) {
+            player.src = data.direction;
+          }
         } else {
           console.warn(`Invalid location data for user: ${userId}`);
         }
@@ -312,17 +319,19 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Clean up player data on page exit
-  window.addEventListener('beforeunload', event => {
-    if (hasJoinedGame) { // Only update the status if the player has joined
-      const userId = localStorage.getItem('currentUser');
-      readUserDataByName(userId).then(data => {
-        if (data.online === 'y') {
-          updateUserData(userId, { online: 'n' });
-        }
-      });
-    }
-
-    event.preventDefault();
-    event.returnValue = '';
-  });
+  setTimeout(() => {
+    window.addEventListener('beforeunload', event => {
+      if (hasJoinedGame) { // Only update the status if the player has joined
+        const userId = localStorage.getItem('currentUser');
+        readUserDataByName(userId).then(data => {
+          if (data.online === 'y') {
+            updateUserData(userId, { online: 'n' });
+          }
+        });
+      }
+  
+      event.preventDefault();
+      event.returnValue = '';
+    });
+  }, 1000);
 });
