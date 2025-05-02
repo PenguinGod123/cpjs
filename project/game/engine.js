@@ -22,12 +22,7 @@ const mpc = {
       return;
     }
     
-    // Update user data to mark the player as online
-    updateUserData(userId, {
-      online: 'y',
-      location: { x: x, y: y },
-      direction: `/game/skins/bluepenguin/down.png`,
-    });
+    
     let player = document.getElementById(userId);
 
     if (!player) {
@@ -52,7 +47,7 @@ const mpc = {
     window.mp = player; // Save player element globally
     updateUserData(userId, {
       online: 'y',
-      location: { x: x, y: y },
+      location: { x: percentToPixels(x, window.innerWidth), y: percentToPixels(y, window.innerHeight) },
       direction: `/game/skins/bluepenguin/down.png`,
     });
     console.log('Player spawned:', userId);
@@ -181,6 +176,8 @@ async function syncPlayers() {
       if (!player) {
         console.log(`Creating new player element for: ${userId}`);
         player = document.createElement('img');
+        player.style.top = `${percentToPixels(data.location.y, window.innerHeight)}px`;
+        player.style.left = `${percentToPixels(window.innerWidth, data.location.x)}px`;
         player.id = userId;
         player.src = data.direction;
         player.alt = data.name;
