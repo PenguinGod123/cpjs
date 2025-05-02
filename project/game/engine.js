@@ -245,6 +245,17 @@ const scene = {
     document.body.style.backgroundImage = `url(/game/markup/${scene}.webp)`;
 
     sessionStorage.setItem('scene', scene);
+    
+    scene.clearObjects();
+    if (scene.get() === 'welcomeroom') {
+      scene.addObject('toPlaza', {
+          location: { x: 450, y: 500 },
+          size: { width: 20, height: 20 },
+          backgroundImage: '/game/src/arrow.png',
+          type: 'portal',
+          portalTarget: 'plaza'
+      });
+    }
   },
 
   get() {
@@ -268,6 +279,13 @@ const scene = {
         scene.set(targetScene);
       });
     }
+  },
+
+  clearObjects() {
+    const objects = document.querySelectorAll('.scene-object');
+    objects.forEach(object => {
+      object.remove();
+    });
   }
 };
 
