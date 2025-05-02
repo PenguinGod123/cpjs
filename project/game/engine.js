@@ -276,9 +276,9 @@ const scene = {
 
     sessionStorage.setItem('scene', scene);
 
-    scene.clearObjects();
-    if (scene.get() === 'welcomeroom') {
-      scene.addObject('toPlaza', {
+    this.clearObjects();
+    if (this.get() === 'welcomeroom') { // Use 'this' to refer to the scene object
+      this.addObject('toPlaza', {
           location: { x: 450, y: 500 },
           size: { width: 20, height: 20 },
           backgroundImage: '/game/src/arrow.png',
