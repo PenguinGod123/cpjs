@@ -1,11 +1,12 @@
 document.body.style.backgroundSize = 'cover';
 document.body.style.backgroundRepeat = 'no-repeat';
+sessionStorage.setItem('scene', 'welcomeroom');
 
 function percentToPixels(percentage, totalDimension) {
     return (percentage / 100) * totalDimension;
 }
 
-console.log(localStorage.getItem('scene'));
+console.log(sessionStorage.getItem('scene'));
 // Multiplayer Game Script
 document.body.insertAdjacentHTML(
   'afterbegin',
@@ -21,16 +22,11 @@ const mpc = {
       return;
     }
 
-    if (userId === null) {
-      console.warn('Error: IU')
-      return;
-    }
-
-    // Update user data
+    // Update user data to mark the player as online
     updateUserData(userId, {
       online: 'y',
       location: { x: x, y: y },
-      direction: 'default',
+      direction: '/game/skins/bluepenguin/down.png',
     });
 
     let player = document.getElementById(userId);
@@ -52,13 +48,14 @@ const mpc = {
       });
 
       document.body.appendChild(player);
-      updateUserData(userId, { location: { x: `${percentToPixels(x, window.innerHeight)}px`, y: `${percentToPixels(y, window.innerHeight)}px`, }, });
     }
-    player = document.getElementById(userId);
 
     window.mp = player; // Save player element globally
-    mp.top = y;
-    mp.left = x;
+    updateUserData(userId, {
+      online: 'y',
+      location: { x: x, y: y },
+      direction: 'default',
+    });
     console.log('Player spawned:', userId);
   },
 
@@ -135,27 +132,23 @@ document.addEventListener('mousemove', event => {
   const { left, right, top, bottom } = player.getBoundingClientRect();
 
   readUserDataByName(localStorage.getItem('currentUser')).then(data => {
-    window.readData1231234 = data;
-  });
-
-  if (readData1231234.skin === 'bluepenguin') {
-    window.directionMap = {
-      left: 'https://codehs.com/uploads/9a796bc9d2d250e7903cb79a94b12331',
-      right: 'https://codehs.com/uploads/799edbfdbe64d6ea9e397ad818fa5429',
-      up: 'https://codehs.com/uploads/14210849542fff8211c671bf9aa9a3f4',
-      down: 'https://codehs.com/uploads/12ae6fc185a97a71f54b726e1432e321',
+    const skin = data.skin || 'bluepenguin'; // Default skin if not set
+    const directionMap = {
+      left: `/game/skins/${skin}/left.png`,
+      right: `/game/skins/${skin}/right.png`,
+      up: `/game/skins/${skin}/up.png`,
+      down: `/game/skins/${skin}/down.png`,
     };
-  }
-
-  let directionImage;
-  if (clientX < left) directionImage = directionMap.left;
-  else if (clientX > right) directionImage = directionMap.right;
-  else if (clientY < top) directionImage = directionMap.up;
-  else if (clientY > bottom) directionImage = directionMap.down;
-
-  if (directionImage) {
-    updateUserData(userId, { direction: directionImage });
-  }
+    let directionImage;
+    if (clientX < left) directionImage = directionMap.left;
+    else if (clientX > right) directionImage = directionMap.right;
+    else if (clientY < top) directionImage = directionMap.up;
+    else if (clientY > bottom) directionImage = directionMap.down;
+  
+    if (directionImage) {
+      updateUserData(userId, { direction: directionImage });
+    }
+  });
   updateUserData(userId, {scene: scene.get()});
 });
 
@@ -174,22 +167,11 @@ async function syncPlayers() {
   const allUsers = window.allusers;
 
   Object.entries(allUsers).forEach(([userId, data]) => {
-    if (!userId || typeof data !== 'object') return;
-    if (data.name === ('null' || null)) {
-      removeUser('null');
-      return;
-    }
-
-    // Example condition: Set offline if user has no activity
-    if (data.lastActive && Date.now() - data.lastActive > 25000) {
-      // 25 seconds idle
-      updateUserData(userId, { online: 'n' });
-      console.log(`Setting user offline due to inactivity: ${userId}`);
-    }
 
     // Process online users
-    if (data.online === 'y') {
+    if (data.online === 'y' && data.scene === scene.get()) {
       let player = document.getElementById(userId);
+      updateUserData(userId, { online: 'y' });
 
       if (!player) {
         console.log(`Creating new player element for: ${userId}`);
@@ -210,14 +192,14 @@ async function syncPlayers() {
         if (data.location && data.location.x != null && data.location.y != null) {
           player.style.left = `${data.location.x}px`;
           player.style.top = `${data.location.y}px`;
+          player.src = data.direction;
         } else {
           console.warn(`Invalid location data for user: ${userId}`);
         }
-        player.setAttribute('src', data.direction);
       }
-    } else if (data.online === 'n' || data.scene !== scene.get()) {
+    } else if (data.online === 'n' || (data.scene && data.scene !== scene.get())) {
       const offlinePlayer = document.getElementById(userId);
-      if (offlinePlayer || data.name === ('null' || null)) {
+      if (offlinePlayer) {
         console.log(`Removing player element for offline user: ${userId}`);
         offlinePlayer.remove();
       }
@@ -285,7 +267,10 @@ const scene = {
 window.scene = scene;
 
 // Event Listeners
+let hasJoinedGame = false; // Flag to track if the player has joined the game
+
 document.addEventListener('DOMContentLoaded', () => {
+  hasJoinedGame = true; // Set the flag when the game is fully loaded
   // Custom right-click menu
   document.addEventListener('contextmenu', event => {
     event.preventDefault();
@@ -328,13 +313,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Clean up player data on page exit
   window.addEventListener('beforeunload', event => {
-    const userId = localStorage.getItem('currentUser');
-    updateUserData(userId, { online: 'n', location: { x: null, y: null } });
-    // Set a message for the browser's confirmation dialog
-    event.preventDefault();
-    event.returnValue = ''; // This triggers the default dialog for most browsers
+    if (hasJoinedGame) { // Only update the status if the player has joined
+      const userId = localStorage.getItem('currentUser');
+      readUserDataByName(userId).then(data => {
+        if (data.online === 'y') {
+          updateUserData(userId, { online: 'n' });
+        }
+      });
+    }
 
-    // Optionally show a custom message for context
-    console.log('Custom message: Are you sure you want to leave?');
+    event.preventDefault();
+    event.returnValue = '';
   });
 });

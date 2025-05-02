@@ -67,7 +67,7 @@ rl.on('line', (input) => {
                     return;
                 }
                 if (command === 'once') {
-                    rl.question('data?\n', async (extradata) => {
+                    rl.question('data?\n', async (_extradata) => {
                         try {
                             console.log(`Running db.ref('${path}').${command}('value')`);
                             const snapshot = await db.ref(path).once('value'); // Await the Promise
@@ -112,7 +112,7 @@ const server = http.createServer((req, res) => {
     console.log(`URL attempting to access: ${fullUrl}`);
 
         // Handle POST requests from client and send the data back
-        if (req.method === 'POST') {
+        if (req.method === 'POST' && req.url === '/api') {
             let body = '';
             req.on('data', chunk => {
                 body += chunk.toString();
@@ -132,7 +132,10 @@ const server = http.createServer((req, res) => {
             
                 if (parsedBody.action === 'readUserDataByName') {
                     try {
-                        const snapshot = await db.ref(`cpjs/users/${parsedBody.name}`).once('value');
+                        console.log("here" + parsedBody.name);
+                        const snapshot = (!parsedBody.name || parsedBody.name.trim() === '') 
+                            ? await db.ref(`cpjs/users`).once('value') 
+                            : await db.ref(`cpjs/users/${parsedBody.name}`).once('value');
                         const userData = snapshot.val(); // Extract snapshot data
             
                         if (userData) {
@@ -150,20 +153,11 @@ const server = http.createServer((req, res) => {
                         res.end(JSON.stringify({ error: 'Internal server error' }));
                     }
                 } else if (parsedBody.action === 'updateUserData') {
-                    if (parsedBody.name === ('null' || null)) return;
-                    const check = await db.ref(parsedBody.name).once();
-                    if (check.val() === null) {
-                        console.log('User not found');
-                        res.writeHead(404, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ error: 'User not found' }));
-                        return;
-                    }
                     db.ref(`cpjs/users/${parsedBody.name}`).update(parsedBody.data).then(() => {
                         console.log('User data updated successfully');
                         res.writeHead(200, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify({ message: 'User data updated successfully' }));
-                    }
-                    ).catch((error) => {
+                    }).catch((error) => {
                         console.error('Error updating user data:', error);
                         res.writeHead(500, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify({ error: 'Internal server error' }));
